@@ -56,14 +56,16 @@
             .dashboard-section { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; border: none; z-index: 999; transform: translateY(-100%); transition: transform 0.3s; }
             .dashboard-section.active { transform: translateY(0); }
             .tile { width: 62px; height: 62px; font-size: 30px; }
-            .key { min-width: 32px; height: 50px; font-size: 13px; }
-            .key.wide { min-width: 50px; }
+            .key { min-width: 36px; height: 56px; font-size: 17px; }
+            .key.wide { min-width: 58px; font-size: 12px; }
+            .key.back { font-size: 19px; }
             .header h1 { font-size: 26px; }
             .game-section { padding-bottom: 140px; }
         }
         @media (max-width: 400px) {
             .tile { width: 57px; height: 57px; font-size: 28px; }
-            .key { min-width: 28px; height: 48px; }
+            .key { min-width: 30px; height: 52px; font-size: 16px; }
+            .key.back { font-size: 18px; }
         }
     </style>
 </head>
@@ -237,8 +239,12 @@
                 rowEl.className = 'keyboard-row';
                 row.forEach(key => {
                     const keyEl = document.createElement('button');
-                    keyEl.className = key.length > 1 ? 'key wide' : 'key';
-                    keyEl.textContent = key;
+                    const classes = ['key'];
+                    if (key.length > 1) classes.push('wide');
+                    if (key === 'ENTER') classes.push('enter');
+                    if (key === 'BACK') classes.push('back');
+                    keyEl.className = classes.join(' ');
+                    keyEl.textContent = key === 'BACK' ? '⌫' : key;
                     keyEl.id = `key-${key}`;
                     keyEl.addEventListener('click', () => handleKey(key));
                     rowEl.appendChild(keyEl);
