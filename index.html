@@ -19,8 +19,10 @@
         .app.ready { display: flex; }
         .header { padding: 12px 20px; border-bottom: 2px solid #FF6B35; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 4px; color: #FF6B35; }
-        .icon-btn { background: none; border: 2px solid #FF6B35; color: #FF6B35; width: 36px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-        .mobile-toggle { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; background: #FF6B35; border: none; border-radius: 8px; color: #000; font-size: 15px; font-weight: 700; cursor: pointer; z-index: 1000; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4); font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
+        .header-buttons { display: flex; gap: 8px; }
+        .icon-btn { background: none; border: 2px solid #FF6B35; color: #FF6B35; padding: 0 12px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; font-weight: 700; }
+        .icon-btn.help { width: 36px; padding: 0; font-size: 16px; }
+        .mobile-toggle { display: none; }
         .content-wrapper { display: flex; flex: 1; overflow: hidden; }
         .game-section { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px; overflow-y: auto; }
         .dashboard-section { width: 300px; background: #0a0a0a; border-left: 2px solid #FF6B35; padding: 20px; overflow-y: auto; flex-shrink: 0; }
@@ -75,7 +77,10 @@
     <div class="app" id="app">
         <div class="header">
             <h1>WORDLE</h1>
-            <button class="icon-btn" onclick="showHelp()">?</button>
+            <div class="header-buttons">
+                <button class="icon-btn" id="statsBtn" onclick="toggleDashboard()">STATS</button>
+                <button class="icon-btn help" onclick="showHelp()">?</button>
+            </div>
         </div>
         <div class="content-wrapper">
             <div class="game-section">
@@ -97,7 +102,7 @@
                 <button class="dash-btn" onclick="shareResult()">Share Result</button>
             </div>
         </div>
-        <button class="mobile-toggle" id="toggleBtn" onclick="toggleDashboard()">STATS</button>
+        <button class="mobile-toggle" id="toggleBtn" style="display:none;"></button>
     </div>
 
     <div class="message" id="message"></div>
