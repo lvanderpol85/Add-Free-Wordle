@@ -60,31 +60,31 @@
             .dashboard-section { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; border: none; z-index: 999; transform: translateY(-100%); transition: transform 0.3s; }
             .dashboard-section.active { transform: translateY(0); }
             .tile { width: 62px; height: 62px; font-size: 43px; }
-            .key { min-width: 36px; height: 56px; font-size: 17px; }
-            .key.wide { min-width: 58px; font-size: 12px; }
-            .key.back { font-size: 38px; }
+            .key { min-width: 36px; height: 58px; font-size: 22px; }
+            .key.wide { min-width: 62px; font-size: 13px; }
+            .key.back { font-size: 42px; }
             .header h1 { font-size: 26px; }
             .game-section { padding-bottom: 150px; }
-            .submit-btn { height: 56px; width: 70%; }
+            .submit-btn { height: 62px; width: 65%; max-width: 280px; font-size: 20px; }
         }
         @media (max-width: 400px) {
             .tile { width: 57px; height: 57px; font-size: 41px; }
-            .key { min-width: 30px; height: 52px; font-size: 16px; }
-            .key.back { font-size: 36px; }
-            .submit-btn { height: 52px; }
+            .key { min-width: 30px; height: 56px; font-size: 20px; }
+            .key.back { font-size: 40px; }
+            .submit-btn { height: 60px; width: 65%; font-size: 19px; }
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
-        <h1>WORDLE TEST</h1>
+        <h1>WORDLE</h1>
         <div class="spinner"></div>
         <p style="color: #a0a0a0;">Loading word list...</p>
     </div>
 
     <div class="app" id="app">
         <div class="header">
-            <h1>WORDLE TEST</h1>
+            <h1>WORDLE</h1>
             <div class="header-buttons">
                 <button class="icon-btn" id="statsBtn" onclick="toggleDashboard()">STATS</button>
                 <button class="icon-btn help" onclick="showHelp()">?</button>
