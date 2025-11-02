@@ -136,6 +136,7 @@
 
     <script>
         let VALID_WORDS = [];
+        let ANSWER_WORDS = [];
         let targetWord = '';
         let currentRow = 0;
         let currentTile = 0;
@@ -154,15 +155,16 @@
         // Load word list from CDN (official Wordle dictionary)
         async function loadWords() {
             try {
-                // Try primary source
+                // Load answers (curated list for target words)
                 const response = await fetch('https://cdn.jsdelivr.net/npm/wordles@1.0.0/wordles.json');
                 const answers = await response.json();
+                ANSWER_WORDS = answers.map(w => w.toUpperCase());
                 
                 // Load additional valid guesses
                 const response2 = await fetch('https://cdn.jsdelivr.net/npm/wordles@1.0.0/nonwordles.json');
                 const guesses = await response2.json();
                 
-                // Combine and convert to uppercase
+                // Combine all for validation (answers + guesses)
                 VALID_WORDS = [...answers, ...guesses].map(w => w.toUpperCase());
                 
                 document.getElementById('loading').style.display = 'none';
@@ -192,7 +194,7 @@
             if (savedPool && savedPool !== '[]') {
                 wordPool = JSON.parse(savedPool);
             } else {
-                wordPool = shuffleArray([...VALID_WORDS]);
+                wordPool = shuffleArray([...ANSWER_WORDS]);
                 localStorage.setItem('wordPool', JSON.stringify(wordPool));
             }
         }
@@ -209,7 +211,7 @@
         function selectNewWord() {
             if (wordPool.length === 0) {
                 showCompletionMessage();
-                wordPool = shuffleArray([...VALID_WORDS]);
+                wordPool = shuffleArray([...ANSWER_WORDS]);
                 usedWords = [];
                 localStorage.setItem('wordPool', JSON.stringify(wordPool));
                 localStorage.setItem('usedWords', JSON.stringify(usedWords));
