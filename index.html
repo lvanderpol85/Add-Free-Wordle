@@ -154,6 +154,8 @@
         let wordPool = [];
         let lastGameWon = false;
         let isRevealing = false;
+        const STORAGE_VERSION = 1;
+        const SAVE_KEY = 'wordleGame_v1';
 
         const keyboard = [
             ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -189,9 +191,13 @@
             createBoard();
             createKeyboard();
             loadGameState();
-            selectNewWord();
+            const restored = restoreGame();
+            if (!restored) {
+                selectNewWord();
+                startTime = Date.now();
+                saveGameState();
+            }
             updateDashboard();
-            startTime = Date.now();
         }
 
         function loadGameState() {
@@ -206,6 +212,95 @@
                 wordPool = shuffleArray([...ANSWER_WORDS]);
                 localStorage.setItem('wordPool', JSON.stringify(wordPool));
             }
+        }
+
+        function saveGameState() {
+            const gridLetters = [];
+            for (let i = 0; i < 6; i++) {
+                const rowLetters = [];
+                for (let j = 0; j < 5; j++) {
+                    const tile = document.getElementById(`tile-${i}-${j}`);
+                    rowLetters.push(tile ? tile.textContent : '');
+                }
+                gridLetters.push(rowLetters);
+            }
+            const payload = {
+                v: STORAGE_VERSION,
+                targetWord,
+                currentRow,
+                currentTile,
+                guesses,
+                gridLetters,
+                gameOver,
+                startTime,
+            };
+            localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+        }
+
+        function restoreGame() {
+            const raw = localStorage.getItem(SAVE_KEY);
+            if (!raw) return false;
+            let data;
+            try { data = JSON.parse(raw); } catch { return false; }
+            if (!data || data.v !== STORAGE_VERSION) return false;
+            if (!data.targetWord || (!ANSWER_WORDS.includes(data.targetWord) && !usedWords.includes(data.targetWord) && !wordPool.includes(data.targetWord))) {
+                return false;
+            }
+
+            // restore primitives
+            targetWord = data.targetWord;
+            currentRow = Math.min(5, Math.max(0, data.currentRow || 0));
+            currentTile = Math.min(5, Math.max(0, data.currentTile || 0));
+            gameOver = Boolean(data.gameOver);
+            guesses = Array.isArray(data.guesses) ? data.guesses.slice(0, 6) : [];
+            startTime = typeof data.startTime === 'number' ? data.startTime : Date.now();
+
+            // restore grid letters
+            const gridLetters = Array.isArray(data.gridLetters) ? data.gridLetters : [];
+            for (let i = 0; i < 6; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const tile = document.getElementById(`tile-${i}-${j}`);
+                    const letter = (gridLetters[i] && gridLetters[i][j]) || '';
+                    tile.textContent = letter;
+                    tile.className = 'tile' + (letter ? ' filled' : '');
+                }
+            }
+
+            // apply results for completed rows and rebuild keyboard colors
+            for (let r = 0; r < currentRow; r++) {
+                const guess = (gridLetters[r] || []).join('');
+                const results = computeResults(guess, targetWord);
+                for (let c = 0; c < 5; c++) {
+                    const tile = document.getElementById(`tile-${r}-${c}`);
+                    tile.classList.add(results[c]);
+                    updateKeyboard(guess[c], results[c]);
+                }
+            }
+
+            return true;
+        }
+
+        function computeResults(guess, target) {
+            const results = [];
+            const targetLetters = target.split('');
+            const guessLetters = guess.split('');
+            for (let i = 0; i < 5; i++) {
+                if (guessLetters[i] === targetLetters[i]) {
+                    results[i] = 'correct';
+                    targetLetters[i] = null;
+                }
+            }
+            for (let i = 0; i < 5; i++) {
+                if (results[i]) continue;
+                const index = targetLetters.indexOf(guessLetters[i]);
+                if (index !== -1) {
+                    results[i] = 'present';
+                    targetLetters[index] = null;
+                } else {
+                    results[i] = 'absent';
+                }
+            }
+            return results;
         }
 
         function shuffleArray(array) {
@@ -298,6 +393,7 @@
             setTimeout(() => key.classList.remove('pop'), 300);
             
             currentTile++;
+            saveGameState();
         }
 
         function deleteLetter() {
@@ -306,6 +402,7 @@
                 const tile = document.getElementById(`tile-${currentRow}-${currentTile}`);
                 tile.textContent = '';
                 tile.classList.remove('filled');
+                saveGameState();
             }
         }
 
@@ -328,6 +425,7 @@
             isRevealing = true;
             guesses.push(guess);
             checkGuess(guess);
+            saveGameState();
         }
 
         function checkGuess(guess) {
@@ -386,6 +484,7 @@
                     currentRow++;
                     currentTile = 0;
                     isRevealing = false;
+                    saveGameState();
                 }
             }, 1500);
         }
@@ -530,6 +629,7 @@
             });
             
             selectNewWord();
+            saveGameState();
         }
 
         document.addEventListener('keydown', (e) => {
