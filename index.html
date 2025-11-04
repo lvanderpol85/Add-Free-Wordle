@@ -633,6 +633,7 @@
         }
 
         document.addEventListener('keydown', (e) => {
+            if (e.metaKey || e.ctrlKey || e.altKey) return; // ignore modifier shortcuts (e.g., Cmd+R)
             if (gameOver && e.key === 'Enter') {
                 newGame();
             } else if (!gameOver) {
