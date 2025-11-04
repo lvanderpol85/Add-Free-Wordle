@@ -153,6 +153,7 @@
         let usedWords = [];
         let wordPool = [];
         let lastGameWon = false;
+        let isRevealing = false;
 
         const keyboard = [
             ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -275,7 +276,7 @@
         }
 
         function handleKey(key) {
-            if (gameOver) return;
+            if (gameOver || isRevealing) return;
 
             if (key === 'ENTER') {
                 submitGuess();
@@ -324,6 +325,7 @@
                 return;
             }
 
+            isRevealing = true;
             guesses.push(guess);
             checkGuess(guess);
         }
@@ -383,6 +385,7 @@
                 } else {
                     currentRow++;
                     currentTile = 0;
+                    isRevealing = false;
                 }
             }, 1500);
         }
