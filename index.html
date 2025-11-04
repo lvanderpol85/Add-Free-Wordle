@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --key-height: 54px; --key-font-size: 20px; }
         body { font-family: 'Inter', sans-serif; background: #000; color: #f5f5f5; min-height: 100vh; overflow: hidden; position: fixed; width: 100%; }
         .loading { display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; gap: 20px; }
         .loading h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: #FF6B35; letter-spacing: 4px; }
@@ -26,29 +27,29 @@
         .icon-btn.help { width: 36px; padding: 0; font-size: 16px; }
         .mobile-toggle { display: none; }
         .content-wrapper { display: flex; flex: 1; overflow: hidden; }
-        .game-section { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 10px 20px 10px; overflow-y: auto; }
+        .game-section { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 10px calc(env(safe-area-inset-bottom, 0) + 20px) 10px; overflow-y: auto; }
         .dashboard-section { width: 300px; background: #0a0a0a; border-left: 2px solid #FF6B35; padding: 20px; overflow-y: auto; flex-shrink: 0; position: relative; }
         .dashboard-section h2 { font-family: 'Bebas Neue'; font-size: 24px; color: #FF6B35; margin-bottom: 20px; letter-spacing: 2px; }
         .stat-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; color: #a0a0a0; font-size: 13px; }
         .stat-value { font-weight: 700; color: #f5f5f5; font-size: 15px; }
         .dash-btn { width: 100%; padding: 12px; background: none; border: 2px solid #FF6B35; color: #FF6B35; border-radius: 4px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 13px; }
         .dash-close-btn { display: none; position: absolute; top: 20px; right: 20px; background: none; border: 2px solid #FF6B35; color: #FF6B35; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; font-weight: 700; line-height: 1; }
-        .game-board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; margin: 15px 0; }
+        .game-board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; margin: 10px 0; }
         .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
         .tile { width: 62px; height: 62px; border: 2px solid #3a3a3a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 46px; font-weight: 700; background: #1a1a1a; font-family: 'Bebas Neue'; text-transform: uppercase; }
         .tile.filled { border-color: #FF6B35; }
         .tile.correct { background: #FF6B35; border-color: #FF6B35; color: #000; }
         .tile.present { background: #6a6a6a; border-color: #6a6a6a; }
         .tile.absent { background: #2a2a2a; border-color: #2a2a2a; color: #5a5a5a; }
-        .keyboard { width: 100%; max-width: 500px; padding: 10px; margin-top: auto; padding-bottom: 5px; }
+        .keyboard { width: 100%; max-width: 500px; padding: 6px 10px 5px 10px; margin-top: 8px; }
         .keyboard-row { display: flex; gap: 5px; justify-content: center; margin-bottom: 6px; }
-        .key { min-width: 42px; height: 54px; background: #2a2a2a; border: 2px solid #3a3a3a; border-radius: 8px; color: #f5f5f5; font-size: 20px; font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; display: flex; align-items: center; justify-content: center; }
+        .key { min-width: 42px; height: var(--key-height); background: #2a2a2a; border: 2px solid #3a3a3a; border-radius: 8px; color: #f5f5f5; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; display: flex; align-items: center; justify-content: center; }
         .key.wide { min-width: 60px; font-size: 12px; }
-        .key.back { font-size: 23px; }
+        .key.back { font-size: 20px; }
         .key.correct { background: #FF6B35; border-color: #FF6B35; color: #000; }
         .key.present { background: #6a6a6a; }
         .key.absent { background: #1a1a1a; color: #5a5a5a; }
-        .submit-btn { width: 60%; max-width: 300px; height: 54px; background: #000; border: 2px solid #FF6B35; color: #FF6B35; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; letter-spacing: 2px; margin-top: 10px; }
+        .submit-btn { width: 60%; max-width: 300px; height: var(--key-height); background: #000; border: 2px solid #FF6B35; color: #FF6B35; border-radius: 8px; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; letter-spacing: 0px; margin-top: 10px; display: flex; align-items: center; justify-content: center; }
         .submit-btn:active { background: #1a1a1a; }
         .message { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #FF6B35; color: #000; padding: 14px 24px; border-radius: 4px; font-weight: 700; opacity: 0; z-index: 1000; transition: opacity 0.3s; font-size: 14px; }
         .message.show { opacity: 1; }
@@ -63,18 +64,24 @@
             .dashboard-section.active { transform: translateY(0); }
             .dash-close-btn { display: block; }
             .tile { width: 62px; height: 62px; font-size: 43px; }
-            .key { min-width: 36px; height: 58px; font-size: 22px; }
+            :root { --key-height: 58px; --key-font-size: 22px; }
+            .key { min-width: 36px; height: var(--key-height); font-size: var(--key-font-size); }
             .key.wide { min-width: 62px; font-size: 13px; }
-            .key.back { font-size: 42px; }
+            .key.back { font-size: 22px; }
             .header h1 { font-size: 26px; }
-            .game-section { padding-bottom: 150px; }
-            .submit-btn { height: 62px; width: 65%; max-width: 280px; font-size: 20px; }
+            .game-section { padding-bottom: calc(env(safe-area-inset-bottom, 0) + 20px); }
+            .game-board { margin: 8px 0; }
+            .keyboard { padding-top: 4px; }
+            .submit-btn { height: var(--key-height); width: 65%; max-width: 280px; font-size: var(--key-font-size); }
         }
         @media (max-width: 400px) {
             .tile { width: 57px; height: 57px; font-size: 41px; }
-            .key { min-width: 30px; height: 56px; font-size: 20px; }
-            .key.back { font-size: 40px; }
-            .submit-btn { height: 60px; width: 65%; font-size: 19px; }
+            :root { --key-height: 56px; --key-font-size: 20px; }
+            .key { min-width: 30px; height: var(--key-height); font-size: var(--key-font-size); }
+            .key.back { font-size: 20px; }
+            .submit-btn { height: var(--key-height); width: 65%; font-size: var(--key-font-size); }
+            .game-board { margin: 6px 0; }
+            .keyboard { padding-top: 2px; }
         }
     </style>
 </head>
