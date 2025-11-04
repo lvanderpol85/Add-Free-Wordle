@@ -23,7 +23,7 @@
         .header { padding: 12px 20px; border-bottom: 2px solid #FF6B35; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 4px; color: #FF6B35; }
         .header-buttons { display: flex; gap: 8px; }
-        .icon-btn { background: none; border: 2px solid #FF6B35; color: #FF6B35; padding: 0 12px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; font-weight: 700; }
+        .icon-btn { background: none; border: 2px solid #FF6B35; color: #FF6B35; padding: 0 12px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; font-weight: 700; touch-action: manipulation; }
         .icon-btn.help { width: 36px; padding: 0; font-size: 16px; }
         .mobile-toggle { display: none; }
         .content-wrapper { display: flex; flex: 1; overflow: hidden; }
@@ -43,13 +43,13 @@
         .tile.absent { background: #2a2a2a; border-color: #2a2a2a; color: #5a5a5a; }
         .keyboard { width: 100%; max-width: 500px; padding: 6px 10px 5px 10px; margin-top: 8px; }
         .keyboard-row { display: flex; gap: 5px; justify-content: center; margin-bottom: 6px; }
-        .key { min-width: 42px; height: var(--key-height); background: #2a2a2a; border: 2px solid #3a3a3a; border-radius: 8px; color: #f5f5f5; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; display: flex; align-items: center; justify-content: center; }
+        .key { min-width: 42px; height: var(--key-height); background: #2a2a2a; border: 2px solid #3a3a3a; border-radius: 8px; color: #f5f5f5; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
         .key.wide { min-width: 60px; font-size: 12px; }
         .key.back { font-size: 20px; }
         .key.correct { background: #FF6B35; border-color: #FF6B35; color: #000; }
         .key.present { background: #6a6a6a; }
         .key.absent { background: #1a1a1a; color: #5a5a5a; }
-        .submit-btn { width: 60%; max-width: 300px; height: var(--key-height); background: #000; border: 2px solid #FF6B35; color: #FF6B35; border-radius: 8px; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; letter-spacing: 0px; margin-top: 10px; display: flex; align-items: center; justify-content: center; }
+        .submit-btn { width: 60%; max-width: 300px; height: var(--key-height); background: #000; border: 2px solid #FF6B35; color: #FF6B35; border-radius: 8px; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; letter-spacing: 0px; margin-top: 10px; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
         .submit-btn:active { background: #1a1a1a; }
         .message { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #FF6B35; color: #000; padding: 14px 24px; border-radius: 4px; font-weight: 700; opacity: 0; z-index: 1000; transition: opacity 0.3s; font-size: 14px; }
         .message.show { opacity: 1; }
@@ -650,6 +650,9 @@
 
         // Start loading words
         loadWords();
+
+        // Prevent double-tap zoom on iOS by canceling dblclick default
+        document.addEventListener('dblclick', function(e) { e.preventDefault(); }, { passive: false });
     </script>
 </body>
 </html>
