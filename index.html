@@ -152,6 +152,7 @@
         let startTime = null;
         let usedWords = [];
         let wordPool = [];
+        let lastGameWon = false;
 
         const keyboard = [
             ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -361,6 +362,7 @@
             setTimeout(() => {
                 if (guess === targetWord) {
                     gameOver = true;
+                    lastGameWon = true;
                     const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
                     updateStats(true, currentRow + 1, timeElapsed);
                     showMessage('Excellent!');
@@ -370,6 +372,7 @@
                     }, 2000);
                 } else if (currentRow === 5) {
                     gameOver = true;
+                    lastGameWon = false;
                     const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
                     updateStats(false, 0, timeElapsed);
                     showMessage(`The word was ${targetWord}`);
@@ -455,7 +458,8 @@
                 return;
             }
             
-            let result = `Luke's Wordle ${currentRow < 6 ? currentRow + 1 : 'X'}/6\n\n`;
+            const attemptsText = lastGameWon ? (currentRow + 1) : 'X';
+            let result = `Luke's Wordle ${attemptsText}/6\n\n`;
             for (let i = 0; i <= Math.min(currentRow, 5); i++) {
                 for (let j = 0; j < 5; j++) {
                     const tile = document.getElementById(`tile-${i}-${j}`);
@@ -500,6 +504,7 @@
             gameOver = false;
             guesses = [];
             startTime = Date.now();
+            lastGameWon = false;
             
             for (let i = 0; i < 6; i++) {
                 for (let j = 0; j < 5; j++) {
