@@ -509,9 +509,16 @@
                 }
             }
             
-            keyboard.flat().forEach(key => {
-                const keyEl = document.getElementById(`key-${key}`);
-                keyEl.className = key.length > 1 ? 'key wide' : 'key';
+            keyboard.flat().forEach(keyValue => {
+                const keyEl = document.getElementById(`key-${keyValue}`);
+                if (!keyEl) return;
+                if (keyValue === 'BACK') {
+                    keyEl.className = 'key wide back';
+                } else if (keyValue.length > 1) {
+                    keyEl.className = 'key wide';
+                } else {
+                    keyEl.className = 'key';
+                }
             });
             
             selectNewWord();
