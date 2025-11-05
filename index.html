@@ -44,12 +44,16 @@
         .keyboard { width: 100%; max-width: 500px; padding: 6px 10px 5px 10px; margin-top: 8px; }
         .keyboard-row { display: flex; gap: 5px; justify-content: center; margin-bottom: 6px; }
         .key { min-width: 42px; height: var(--key-height); background: #2a2a2a; border: 2px solid #3a3a3a; border-radius: 8px; color: #f5f5f5; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+        .key.is-pressed { background: #3a3a3a; border-color: #FF6B35; transform: translateY(1px); }
+        .key.pop { animation: keypop 120ms ease-out; }
+        @keyframes keypop { from { transform: scale(0.98); } to { transform: scale(1); } }
         .key.wide { min-width: 60px; font-size: 12px; }
         .key.back { font-size: 20px; }
         .key.correct { background: #FF6B35; border-color: #FF6B35; color: #000; }
         .key.present { background: #6a6a6a; }
         .key.absent { background: #1a1a1a; color: #5a5a5a; }
         .submit-btn { width: 60%; max-width: 300px; height: var(--key-height); background: #000; border: 2px solid #FF6B35; color: #FF6B35; border-radius: 8px; font-size: var(--key-font-size); font-weight: 700; cursor: pointer; font-family: 'Bebas Neue'; letter-spacing: 0px; margin-top: 10px; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+        .submit-btn.is-pressed { background: #0a0a0a; border-color: #FF6B35; transform: translateY(1px); }
         .submit-btn:active { background: #1a1a1a; }
         .message { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #FF6B35; color: #000; padding: 14px 24px; border-radius: 4px; font-weight: 700; opacity: 0; z-index: 1000; transition: opacity 0.3s; font-size: 14px; }
         .message.show { opacity: 1; }
@@ -104,7 +108,7 @@
             <div class="game-section">
                 <div class="game-board" id="board"></div>
                 <div class="keyboard" id="keyboard"></div>
-                <button class="submit-btn" onclick="handleKey('ENTER')">SUBMIT</button>
+                <button class="submit-btn" id="submitBtn" onclick="handleKey('ENTER')">SUBMIT</button>
             </div>
             <div class="dashboard-section" id="dashboard">
                 <button class="dash-close-btn" onclick="toggleDashboard()">✕</button>
@@ -368,6 +372,14 @@
                     keyEl.className = classes.join(' ');
                     keyEl.textContent = key === 'BACK' ? '⌫' : key;
                     keyEl.id = `key-${key}`;
+                    // visual pressed state + haptic for on-screen taps
+                    keyEl.addEventListener('pointerdown', () => {
+                        keyEl.classList.add('is-pressed');
+                        hapticTap();
+                    });
+                    const clearPress = () => keyEl.classList.remove('is-pressed');
+                    keyEl.addEventListener('pointerup', clearPress);
+                    keyEl.addEventListener('pointerleave', clearPress);
                     keyEl.addEventListener('click', () => handleKey(key));
                     rowEl.appendChild(keyEl);
                 });
@@ -592,6 +604,12 @@
             btn.textContent = dashboard.classList.contains('active') ? 'CLOSE' : 'STATS';
         }
 
+        function hapticTap() {
+            if (navigator && typeof navigator.vibrate === 'function') {
+                navigator.vibrate(10);
+            }
+        }
+
         function showHelp() {
             document.getElementById('helpModal').classList.add('show');
         }
@@ -609,6 +627,7 @@
             currentRow = 0;
             currentTile = 0;
             gameOver = false;
+            isRevealing = false;
             guesses = [];
             startTime = Date.now();
             lastGameWon = false;
@@ -653,6 +672,16 @@
 
         // Prevent double-tap zoom on iOS by canceling dblclick default
         document.addEventListener('dblclick', function(e) { e.preventDefault(); }, { passive: false });
+
+        // Submit button pressed visual + haptic
+        (function(){
+            const submit = document.getElementById('submitBtn');
+            const press = () => { submit.classList.add('is-pressed'); hapticTap(); };
+            const clear = () => submit.classList.remove('is-pressed');
+            submit.addEventListener('pointerdown', press);
+            submit.addEventListener('pointerup', clear);
+            submit.addEventListener('pointerleave', clear);
+        })();
     </script>
 </body>
 </html>
