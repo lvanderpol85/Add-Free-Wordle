@@ -212,10 +212,23 @@
             const savedUsed = localStorage.getItem('usedWords');
             const savedPool = localStorage.getItem('wordPool');
             
-            if (savedUsed) usedWords = JSON.parse(savedUsed);
+            if (savedUsed) {
+                usedWords = JSON.parse(savedUsed);
+                // Filter out any invalid words that aren't in official answer list
+                usedWords = usedWords.filter(w => ANSWER_WORDS_SET && ANSWER_WORDS_SET.has(w));
+            }
             
             if (savedPool && savedPool !== '[]') {
                 wordPool = JSON.parse(savedPool);
+                // Validate and filter wordPool to only include official Wordle answers
+                if (ANSWER_WORDS_SET) {
+                    wordPool = wordPool.filter(w => ANSWER_WORDS_SET.has(w));
+                }
+                // If pool is empty or invalid, regenerate from official list
+                if (wordPool.length === 0) {
+                    wordPool = shuffleArray([...ANSWER_WORDS]);
+                    localStorage.setItem('wordPool', JSON.stringify(wordPool));
+                }
             } else {
                 wordPool = shuffleArray([...ANSWER_WORDS]);
                 localStorage.setItem('wordPool', JSON.stringify(wordPool));
@@ -331,6 +344,15 @@
             }
             
             targetWord = wordPool.pop();
+            // Final validation: ensure selected word is in official answer list
+            if (!ANSWER_WORDS_SET || !ANSWER_WORDS_SET.has(targetWord)) {
+                console.warn('Invalid word in pool:', targetWord, '- regenerating pool');
+                wordPool = shuffleArray([...ANSWER_WORDS]);
+                usedWords = [];
+                localStorage.setItem('wordPool', JSON.stringify(wordPool));
+                localStorage.setItem('usedWords', JSON.stringify(usedWords));
+                targetWord = wordPool.pop();
+            }
             usedWords.push(targetWord);
             localStorage.setItem('wordPool', JSON.stringify(wordPool));
             localStorage.setItem('usedWords', JSON.stringify(usedWords));
