@@ -20,7 +20,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .app { display: none; height: 100vh; flex-direction: column; }
         .app.ready { display: flex; }
-        .header { padding: 12px 20px; border-bottom: 2px solid #FF6B35; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .header { padding: calc(env(safe-area-inset-top, 0) + 12px) 20px 12px 20px; border-bottom: 2px solid #FF6B35; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 4px; color: #FF6B35; }
         .header-buttons { display: flex; gap: 8px; }
         .icon-btn { background: none; border: 2px solid #FF6B35; color: #FF6B35; padding: 0 12px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; font-weight: 700; touch-action: manipulation; }
@@ -28,12 +28,16 @@
         .mobile-toggle { display: none; }
         .content-wrapper { display: flex; flex: 1; overflow: hidden; }
         .game-section { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 10px calc(env(safe-area-inset-bottom, 0) + 20px) 10px; overflow-y: auto; }
-        .dashboard-section { width: 300px; background: #0a0a0a; border-left: 2px solid #FF6B35; padding: 20px; overflow-y: auto; flex-shrink: 0; position: relative; }
+        .dashboard-section { width: 300px; background: #0a0a0a; border-left: 2px solid #FF6B35; padding: 20px; overflow-y: auto; flex-shrink: 0; position: relative; transition: transform 0.3s, width 0.3s; }
+        .dashboard-section.hidden { width: 0; transform: translateX(100%); overflow: hidden; padding: 0; border: none; }
         .dashboard-section h2 { font-family: 'Bebas Neue'; font-size: 24px; color: #FF6B35; margin-bottom: 20px; letter-spacing: 2px; }
         .stat-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; color: #a0a0a0; font-size: 13px; }
         .stat-value { font-weight: 700; color: #f5f5f5; font-size: 15px; }
         .dash-btn { width: 100%; padding: 12px; background: none; border: 2px solid #FF6B35; color: #FF6B35; border-radius: 4px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 13px; }
         .dash-close-btn { display: none; position: absolute; top: 20px; right: 20px; background: none; border: 2px solid #FF6B35; color: #FF6B35; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; font-weight: 700; line-height: 1; }
+        @media (min-width: 1025px) {
+            .dash-close-btn { display: block; }
+        }
         .game-board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; margin: 10px 0; }
         .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
         .tile { width: 62px; height: 62px; border: 2px solid #3a3a3a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 46px; font-weight: 700; background: #1a1a1a; font-family: 'Bebas Neue'; text-transform: uppercase; }
@@ -126,7 +130,6 @@
                 <button class="dash-btn" onclick="shareResult()">Share Result</button>
             </div>
         </div>
-        <button class="mobile-toggle" id="toggleBtn" style="display:none;"></button>
     </div>
 
     <div class="message" id="message"></div>
@@ -162,6 +165,15 @@
         let isRevealing = false;
         const STORAGE_VERSION = 1;
         const SAVE_KEY = 'wordleGame_v1';
+        
+        // Animation and timing constants
+        const TILE_REVEAL_DELAY = 300; // ms between each tile reveal
+        const REVEAL_ANIMATION_DURATION = 1500; // ms total for all tiles
+        const WIN_MESSAGE_DELAY = 2000; // ms before starting new game after win
+        const LOSS_MESSAGE_DELAY = 3000; // ms before starting new game after loss
+        const MESSAGE_DISPLAY_DURATION = 2000; // ms to show toast messages
+        const KEY_POP_ANIMATION_DURATION = 300; // ms for key pop animation
+        const HAPTIC_DURATION = 10; // ms for haptic feedback
 
         const keyboard = [
             ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -429,7 +441,7 @@
             // Add pop effect to keyboard key
             const key = document.getElementById(`key-${letter}`);
             key.classList.add('pop');
-            setTimeout(() => key.classList.remove('pop'), 300);
+            setTimeout(() => key.classList.remove('pop'), KEY_POP_ANIMATION_DURATION);
             
             currentTile++;
             saveGameState();
@@ -495,7 +507,7 @@
                     const tile = document.getElementById(`tile-${currentRow}-${i}`);
                     tile.classList.add(results[i]);
                     updateKeyboard(guessLetters[i], results[i]);
-                }, i * 300);
+                }, i * TILE_REVEAL_DELAY);
             }
 
             setTimeout(() => {
@@ -508,7 +520,7 @@
                     setTimeout(() => {
                         updateDashboard();
                         newGame();
-                    }, 2000);
+                    }, WIN_MESSAGE_DELAY);
                 } else if (currentRow === 5) {
                     gameOver = true;
                     lastGameWon = false;
@@ -518,14 +530,14 @@
                     setTimeout(() => {
                         updateDashboard();
                         newGame();
-                    }, 3000);
+                    }, LOSS_MESSAGE_DELAY);
                 } else {
                     currentRow++;
                     currentTile = 0;
                     isRevealing = false;
                     saveGameState();
                 }
-            }, 1500);
+            }, REVEAL_ANIMATION_DURATION);
         }
 
         function updateKeyboard(letter, result) {
@@ -540,7 +552,7 @@
             const message = document.getElementById('message');
             message.textContent = text;
             message.classList.add('show');
-            setTimeout(() => message.classList.remove('show'), 2000);
+            setTimeout(() => message.classList.remove('show'), MESSAGE_DISPLAY_DURATION);
         }
 
         function loadStats() {
@@ -622,13 +634,22 @@
         function toggleDashboard() {
             const dashboard = document.getElementById('dashboard');
             const btn = document.getElementById('statsBtn');
-            dashboard.classList.toggle('active');
-            btn.textContent = dashboard.classList.contains('active') ? 'CLOSE' : 'STATS';
+            const isMobile = window.innerWidth <= 1024;
+            
+            if (isMobile) {
+                // Mobile: slide down/up
+                dashboard.classList.toggle('active');
+                btn.textContent = dashboard.classList.contains('active') ? 'CLOSE' : 'STATS';
+            } else {
+                // Desktop: hide/show sidebar
+                dashboard.classList.toggle('hidden');
+                btn.textContent = dashboard.classList.contains('hidden') ? 'STATS' : 'CLOSE';
+            }
         }
 
         function hapticTap() {
             if (navigator && typeof navigator.vibrate === 'function') {
-                navigator.vibrate(10);
+                navigator.vibrate(HAPTIC_DURATION);
             }
         }
 
